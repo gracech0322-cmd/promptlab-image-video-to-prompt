@@ -8,7 +8,7 @@ PromptLab is a Chrome extension for AI creators, prompt learners, visual referen
 
 - [What Is PromptLab?](#what-is-promptlab)
 - [Features](#features)
-- [How to Install PromptLab?](#how-to-install-promptlab)
+- [Installation](#installation)
 - [How to Get Free Gemini API Key?](#how-to-get-free-gemini-api-key)
 - [API Key Privacy](#api-key-privacy)
 - [Settings](#settings)
@@ -80,26 +80,43 @@ For video analysis, please upload a local video file.
 - Copy and use directly
 
 
-## How to Install PromptLab?
+## Installation
 
-1. Download or clone this repository.
-2. If a built `dist/` folder already exists, use that folder for Chrome.
-3. If there is no `dist/` folder, build it first:
+### Option 1: Install from Download ZIP, recommended for most users
+
+1. Click Code -> Download ZIP on GitHub.
+2. Unzip the file.
+3. Open Chrome and go to `chrome://extensions/`.
+4. Turn on Developer mode.
+5. Click Load unpacked.
+6. Select the `dist/` folder.
+
+Important:
+
+- Select `dist/`
+- Do not select the project root folder
+- Do not select `src/`
+- Do not select `assets/`
+
+If there is no `dist/` folder in the downloaded ZIP, use Option 2 to build it manually.
+
+After the extension loads, open Settings and add your Gemini API Key.
+
+### Option 2: Build manually
+
+1. Clone or download this repository.
+2. Open Terminal in the project folder.
+3. Run:
 
 ```bash
 npm install
 npm run build
 ```
 
-4. Open Chrome.
-5. Go to `chrome://extensions/`.
-6. Enable Developer mode.
-7. Click Load unpacked.
-8. Select the generated `dist/` folder.
-
-Do not select the project root folder.
-Do not select `src/`.
-Do not select `assets/`.
+4. After build finishes, open Chrome and go to `chrome://extensions/`.
+5. Turn on Developer mode.
+6. Click Load unpacked.
+7. Select the generated `dist/` folder.
 
 After the extension loads, open Settings and add your Gemini API Key.
 

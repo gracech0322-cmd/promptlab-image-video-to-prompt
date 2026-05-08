@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "PromptLab: Image & Video to Prompt",
+  "version": "0.1.0",
+  "description": "Turn local videos and images into AI-ready prompts using Gemini.",
+  "permissions": [
+    "activeTab",
+    "contextMenus",
+    "sidePanel",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "assets/background.js",
+    "type": "module"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_title": "PromptLab: Image & Video to Prompt"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
