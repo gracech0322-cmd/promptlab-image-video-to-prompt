@@ -1,6 +1,6 @@
-# PromptLab Chrome Extension
+# PromptLab: Image & Video to Prompt
 
-PromptLab is a Chrome extension for turning local videos and images into reusable AI prompts with Gemini.
+PromptLab is a free, open-source Chrome extension for turning local videos, web images, and local images into reusable AI prompts with Gemini.
 
 Current V1 product scope:
 
