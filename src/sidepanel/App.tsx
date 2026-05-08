@@ -357,6 +357,13 @@ function SparklePlaceholder() {
   );
 }
 
+function isApiKeyRequiredState(state: AnalysisState): boolean {
+  return (
+    state.phase === "error" &&
+    (state.errorMessage ?? state.statusText).toLowerCase().includes("api key required")
+  );
+}
+
 export function App() {
   const [settings, setSettings] = useState<StoredSettings>(defaultSettings);
   const [apiKeyInput, setApiKeyInput] = useState("");
@@ -518,8 +525,10 @@ export function App() {
   }
 
   function syncFromBackgroundState(state: AnalysisState) {
+    const shouldFocusSettings = isApiKeyRequiredState(state);
+
     setAnalysisState(state);
-    setPanelView("main");
+    setPanelView(shouldFocusSettings ? "settings" : "main");
 
     if (state.mediaType === "image" && (state.previewFrameUrl || state.imageInfo)) {
       setMediaSource({
@@ -546,6 +555,11 @@ export function App() {
     }
 
     if (state.phase === "error") {
+      if (shouldFocusSettings) {
+        resetPromptResult();
+        return;
+      }
+
       setResultMode("error");
       setResultText(state.errorMessage ?? state.statusText);
       return;
