@@ -4,26 +4,54 @@ Turn local videos and web/local images into ready-to-use AI prompts.
 
 PromptLab is a Chrome extension for AI creators, prompt learners, visual reference study, and short video prompt reverse engineering. It helps you turn local video files, web images, and local image files into clean prompts you can copy and use.
 
-## Table of Contents
+## 🎬 Table of Contents
 
-- ✨ [Features](#features)
-- 🧭 [What PromptLab Does](#what-promptlab-does)
-- 🛠️ [Installation](#installation)
-- 🔑 [Gemini API Key](#gemini-api-key)
-- 🔒 [API Key Privacy](#api-key-privacy)
-- ⚙️ [Settings](#settings)
-- 🎞️ [Video Frame Sampling](#video-frame-sampling)
-- 🖼️ [Image Prompt Logic](#image-prompt-logic)
-- 🎬 [Video Prompt Logic](#video-prompt-logic)
-- 🚧 [Current Limitations](#current-limitations)
-- 🛡️ [Privacy](#privacy)
-- 🗺️ [Roadmap](#roadmap)
-- 📄 [License](#license)
+- [What Is PromptLab?](#what-is-promptlab)
+- [Features](#features)
+- [How to Install PromptLab?](#how-to-install-promptlab)
+- [How to Get Free Gemini API Key?](#how-to-get-free-gemini-api-key)
+- [API Key Privacy](#api-key-privacy)
+- [Settings](#settings)
+- [Video Frame Sampling](#video-frame-sampling)
+- [Image Prompt Logic](#image-prompt-logic)
+- [Video Prompt Logic](#video-prompt-logic)
+- [Current Limitations](#current-limitations)
+- [Privacy](#privacy)
+- [Roadmap](#roadmap)
+- [License](#license)
+
+## What Is PromptLab?
+
+PromptLab can analyze local video files, web images, and local image files.
+
+### Local Video to Prompt
+
+![Local video to prompt](assets/local-video-to-prompt.jpg)
+
+Upload a local video file. PromptLab samples key frames and turns them into one clean Final Result prompt.
+
+### Web Image to Prompt
+
+![Web image to prompt](assets/web-image-to-prompt.jpg)
+
+Right-click a web image. PromptLab reads the image and creates a ready-to-use image prompt.
+
+### Local Image to Prompt
+
+![Local image to prompt](assets/local-image-to-prompt.jpg)
+
+Upload a local image file. PromptLab uses an image-focused template to create one final prompt for image generation.
+
+PromptLab does not currently support full online video analysis from platforms like Instagram, TikTok, X, Facebook, or YouTube.
+
+For video analysis, please upload a local video file.
+
 
 ## Features
 
 ### Local Video to Prompt
 
+- Best for short local videos under 60 seconds.
 - Upload a local video file
 - Extract key frames automatically
 - Generate one clean Final Result prompt
@@ -51,33 +79,8 @@ PromptLab is a Chrome extension for AI creators, prompt learners, visual referen
 - No unnecessary labels like "Image Prompt:" or "Analysis:"
 - Copy and use directly
 
-## What PromptLab Does
 
-PromptLab can analyze local video files, web images, and local image files.
-
-### Local Video to Prompt
-
-![Local video to prompt](assets/local-video-to-prompt.jpg)
-
-Upload a local video file. PromptLab samples key frames and turns them into one clean Final Result prompt.
-
-### Web Image to Prompt
-
-![Web image to prompt](assets/web-image-to-prompt.jpg)
-
-Right-click a web image. PromptLab reads the image and creates a ready-to-use image prompt.
-
-### Local Image to Prompt
-
-![Local image to prompt](assets/local-image-to-prompt.jpg)
-
-Upload a local image file. PromptLab uses an image-focused template to create one final prompt for image generation.
-
-PromptLab does not currently support full online video analysis from platforms like Instagram, TikTok, X, Facebook, or YouTube.
-
-For video analysis, please upload a local video file.
-
-## Installation
+## How to Install PromptLab?
 
 1. Download or clone this repository.
 2. If a built `dist/` folder already exists, use that folder for Chrome.
@@ -100,7 +103,7 @@ Do not select `assets/`.
 
 After the extension loads, open Settings and add your Gemini API Key.
 
-## Gemini API Key
+## How to Get Free Gemini API Key?
 
 PromptLab uses your own Gemini API Key.
 
