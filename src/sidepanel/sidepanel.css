@@ -127,7 +127,9 @@ textarea {
   color: var(--text-secondary);
   font-size: 0.86rem;
   line-height: 1.4;
-  max-width: 220px;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .header-card {
@@ -1369,9 +1371,6 @@ textarea {
     padding: 12px;
   }
 
-  .header-card p {
-    max-width: 200px;
-  }
 
   .options-shell {
     padding-top: 12px;

@@ -4,6 +4,22 @@ Turn local videos and web/local images into ready-to-use AI prompts.
 
 PromptLab is a Chrome extension for AI creators, prompt learners, visual reference study, and short video prompt reverse engineering. It helps you turn local video files, web images, and local image files into clean prompts you can copy and use.
 
+## Table of Contents
+
+- ✨ [Features](#features)
+- 🧭 [What PromptLab Does](#what-promptlab-does)
+- 🛠️ [Installation](#installation)
+- 🔑 [Gemini API Key](#gemini-api-key)
+- 🔒 [API Key Privacy](#api-key-privacy)
+- ⚙️ [Settings](#settings)
+- 🎞️ [Video Frame Sampling](#video-frame-sampling)
+- 🖼️ [Image Prompt Logic](#image-prompt-logic)
+- 🎬 [Video Prompt Logic](#video-prompt-logic)
+- 🚧 [Current Limitations](#current-limitations)
+- 🛡️ [Privacy](#privacy)
+- 🗺️ [Roadmap](#roadmap)
+- 📄 [License](#license)
+
 ## Features
 
 ### Local Video to Prompt
@@ -37,11 +53,25 @@ PromptLab is a Chrome extension for AI creators, prompt learners, visual referen
 
 ## What PromptLab Does
 
-PromptLab can analyze:
+PromptLab can analyze local video files, web images, and local image files.
 
-- Local video files
-- Web images
-- Local image files
+### Local Video to Prompt
+
+![Local video to prompt](assets/local-video-to-prompt.jpg)
+
+Upload a local video file. PromptLab samples key frames and turns them into one clean Final Result prompt.
+
+### Web Image to Prompt
+
+![Web image to prompt](assets/web-image-to-prompt.jpg)
+
+Right-click a web image. PromptLab reads the image and creates a ready-to-use image prompt.
+
+### Local Image to Prompt
+
+![Local image to prompt](assets/local-image-to-prompt.jpg)
+
+Upload a local image file. PromptLab uses an image-focused template to create one final prompt for image generation.
 
 PromptLab does not currently support full online video analysis from platforms like Instagram, TikTok, X, Facebook, or YouTube.
 
@@ -50,12 +80,25 @@ For video analysis, please upload a local video file.
 ## Installation
 
 1. Download or clone this repository.
-2. Open Chrome.
-3. Go to `chrome://extensions/`.
-4. Enable Developer mode.
-5. Click Load unpacked.
-6. Select the extension folder.
-7. Open Settings and add your Gemini API Key.
+2. If a built `dist/` folder already exists, use that folder for Chrome.
+3. If there is no `dist/` folder, build it first:
+
+```bash
+npm install
+npm run build
+```
+
+4. Open Chrome.
+5. Go to `chrome://extensions/`.
+6. Enable Developer mode.
+7. Click Load unpacked.
+8. Select the generated `dist/` folder.
+
+Do not select the project root folder.
+Do not select `src/`.
+Do not select `assets/`.
+
+After the extension loads, open Settings and add your Gemini API Key.
 
 ## Gemini API Key
 
