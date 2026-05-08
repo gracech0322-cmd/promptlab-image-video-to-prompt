@@ -207,6 +207,10 @@ It focuses on:
 
 Video analysis uses a video-oriented prompt template.
 
+The final result is written in a **Seedance 2.0-style prompt format**, focusing on clear subject description, action details, camera language, motion continuity, and cinematic scene structure.
+
+Although the output is designed around Seedance 2.0-style prompting, it can also be used as a strong reference prompt for other AI video generation models. You may adjust the wording based on the model you use.
+
 It focuses on:
 
 - Subject
