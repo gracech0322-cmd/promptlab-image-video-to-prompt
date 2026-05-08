@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video2Prompt 本地测试页</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Segoe UI", sans-serif;
+        background: #f4efe7;
+        color: #1f1a14;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background:
+          radial-gradient(circle at top left, rgba(255, 145, 77, 0.22), transparent 30%),
+          linear-gradient(180deg, #fffaf2 0%, #f4efe7 100%);
+      }
+
+      .shell {
+        width: min(920px, 100%);
+        display: grid;
+        gap: 16px;
+      }
+
+      .card {
+        border-radius: 20px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(91, 72, 53, 0.12);
+        box-shadow: 0 16px 36px rgba(94, 66, 32, 0.08);
+      }
+
+      h1,
+      p {
+        margin: 0;
+      }
+
+      .stack {
+        display: grid;
+        gap: 12px;
+      }
+
+      .hint {
+        color: #6b5a4a;
+        line-height: 1.5;
+      }
+
+      .video-wrap {
+        display: grid;
+        gap: 10px;
+      }
+
+      video {
+        width: 100%;
+        max-height: 70vh;
+        border-radius: 16px;
+        background: #17130f;
+      }
+
+      input[type="file"] {
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(102, 77, 45, 0.18);
+        background: #fffaf4;
+      }
+
+      code {
+        font-size: 0.95em;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="card stack">
+        <h1>Video2Prompt 本地测试页</h1>
+        <p class="hint">
+          选择一个本地视频文件后，页面会渲染一个标准 HTML5 <code>&lt;video&gt;</code> 元素，适合验证插件的检测、抽帧和 Gemini 生成流程。
+        </p>
+        <p class="hint">
+          如果你是直接打开这个文件，请在 Chrome 扩展详情里开启 <code>Allow access to file URLs</code>。
+        </p>
+      </section>
+
+      <section class="card video-wrap">
+        <input id="videoInput" type="file" accept="video/*" />
+        <video id="video" controls playsinline preload="metadata"></video>
+      </section>
+    </main>
+
+    <script>
+      const input = document.getElementById("videoInput");
+      const video = document.getElementById("video");
+      let currentUrl = "";
+
+      input.addEventListener("change", () => {
+        const file = input.files && input.files[0];
+        if (!file) {
+          return;
+        }
+
+        if (currentUrl) {
+          URL.revokeObjectURL(currentUrl);
+        }
+
+        currentUrl = URL.createObjectURL(file);
+        video.src = currentUrl;
+        video.load();
+      });
+    </script>
+  </body>
+</html>
