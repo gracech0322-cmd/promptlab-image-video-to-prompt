@@ -1,101 +1,225 @@
 # PromptLab: Image & Video to Prompt
 
-PromptLab is a free, open-source Chrome extension for turning local videos, web images, and local images into reusable AI prompts with Gemini.
+Turn local videos and web/local images into ready-to-use AI prompts.
 
-Current V1 product scope:
-
-- Local Video to Prompt
-- Web Image to Prompt
-- Local Image to Prompt
-
-The current version does not support online video analysis.
+PromptLab is a Chrome extension for AI creators, prompt learners, visual reference study, and short video prompt reverse engineering. It helps you turn local video files, web images, and local image files into clean prompts you can copy and use.
 
 ## Features
 
-- Upload a local video and generate a prompt from extracted keyframes
-- Choose local video frame sampling mode: `Fast`, `Standard`, or `Detailed`
-- Right-click a standard web image and analyze it in the side panel
-- Upload a local image and analyze it directly
-- Copy the generated prompt
-- Store prompt history locally in the browser
-- Bring your own Gemini API key
-- No backend server required
+### Local Video to Prompt
 
-## Supported Inputs
+- Upload a local video file
+- Extract key frames automatically
+- Generate one clean Final Result prompt
+- Designed for short creative videos, AI videos, ads, reels, and cinematic clips
+- Default frame sampling mode: Standard
+- Supports Fast / Standard / Detailed frame sampling modes
 
-### Local video
+### Image to Prompt
 
-- Local uploaded video files
-- Duration-based frame extraction
-- Adaptive sampling for `Standard` and `Detailed`
+- Right-click a web image and generate a prompt
+- Upload a local image and generate a prompt
+- Uses a dedicated image prompt template
+- Outputs one clean Final Result prompt
+- Optimized for image generation and visual recreation
 
-### Web image
+### Prompt History
 
-- Standard webpage `<img>` images
-- Triggered from the browser context menu
+- Automatically saves recent generation records
+- Keeps up to 10 recent records
 
-### Local image
+### Simple Output
 
-- `jpg`
-- `jpeg`
-- `png`
-- `webp`
-- `gif` may work depending on browser decoding behavior
+- One unified result: Final Result
+- No long analysis report
+- No unnecessary labels like "Image Prompt:" or "Analysis:"
+- Copy and use directly
+
+## What PromptLab Does
+
+PromptLab can analyze:
+
+- Local video files
+- Web images
+- Local image files
+
+PromptLab does not currently support full online video analysis from platforms like Instagram, TikTok, X, Facebook, or YouTube.
+
+For video analysis, please upload a local video file.
+
+## Installation
+
+1. Download or clone this repository.
+2. Open Chrome.
+3. Go to `chrome://extensions/`.
+4. Enable Developer mode.
+5. Click Load unpacked.
+6. Select the extension folder.
+7. Open Settings and add your Gemini API Key.
+
+## Gemini API Key
+
+PromptLab uses your own Gemini API Key.
+
+You can get a Gemini API Key from Google AI Studio:
+
+https://aistudio.google.com/
+
+After you install the extension, open Settings and paste your Gemini API Key.
+
+## API Key Privacy
+
+Your Gemini API Key is stored locally in your browser extension storage.
+
+The project developer cannot see, collect, or access your API Key.
+
+Images, video frames, and prompts may be sent to Gemini for analysis based on your Gemini API usage.
+
+If you are worried about API usage or accidental exposure, you can set a daily API usage limit in Google AI Studio or Gemini settings.
+
+## Settings
+
+### Gemini API Key
+
+Required. Used to send image or video frame analysis requests to Gemini.
+
+### Frame Sampling Mode
+
+This setting only applies to local video analysis.
+
+Default mode: Standard
+
+Available modes:
+
+- Fast
+- Standard
+- Detailed
+
+Fast:
+
+- Fewer frames
+- Faster analysis
+- Best for quick prompt generation
+
+Standard:
+
+- Default recommended mode
+- Balanced speed and prompt quality
+- Best for most local videos
+
+Detailed:
+
+- More frames
+- Better for complex motion, transitions, ads, and AI showcase videos
+- Slower and may use more API resources
+
+Image analysis does not use frame sampling settings.
+
+## Video Frame Sampling
+
+Fast:
+
+- 5 frames
+- 0%, 25%, 50%, 75%, 95%
+
+Standard:
+
+- duration <= 10s: 6 frames
+- 10s < duration <= 30s: 10 frames
+- 30s < duration <= 60s: 14 frames
+- duration > 60s: 16 frames
+
+Detailed:
+
+- duration <= 10s: 10 frames
+- 10s < duration <= 30s: 16 frames
+- 30s < duration <= 60s: 24 frames
+- duration > 60s: 32 frames
+
+PromptLab samples from 0% to 95% of the video duration. It avoids 100% to reduce the chance of black frames or seek errors.
+
+## Image Prompt Logic
+
+Image analysis uses its own image-oriented prompt template.
+
+It focuses on:
+
+- Subject
+- Scene
+- Composition
+- Style
+- Lighting
+- Color palette
+- Mood
+- Texture
+- Material
+- Perspective
+- Visual quality
+- Image generation keywords
+
+## Video Prompt Logic
+
+Video analysis uses a video-oriented prompt template.
+
+It focuses on:
+
+- Subject
+- Scene
+- Action
+- Camera language
+- Motion
+- Pacing
+- Visual continuity
+- Cinematic structure
+- AI video generation style
+
+## Current Limitations
+
+PromptLab does not support:
+
+- Instagram video extraction
+- TikTok video extraction
+- X / Twitter video extraction
+- Facebook video extraction
+- YouTube video extraction
+- DRM or protected video extraction
+- m3u8 video downloading
+- Streaming video parsing
+
+For best video results, upload a local video file.
 
 ## Privacy
 
-Your Gemini API key is stored locally in your browser.
+PromptLab uses your own Gemini API Key.
 
-PromptLab does not send your API key to any custom backend.
+Your API Key is stored locally in browser extension storage.
 
-Selected images and extracted local video frames are sent directly from your browser to Gemini for analysis.
+The developer cannot access your API Key.
 
-Only analyze media you are comfortable sending to Gemini.
+Depending on your Gemini API usage, images, video frames, and prompts may be sent to Gemini for analysis.
 
-## Limitations
+Do not analyze private, sensitive, or copyrighted content unless you have permission.
 
-- Online video analysis is not supported in the current version
-- Web image analysis currently targets standard `<img>` content only
-- Complex image sources such as CSS background images, canvas-rendered visuals, and special blob/image pipelines are out of scope for V1
+You can set a daily API usage limit in Google AI Studio.
 
-## Development
+## Roadmap
 
-### Install dependencies
+- [x] Local video to prompt
+- [x] Web image to prompt
+- [x] Local image to prompt
+- [x] Fast / Standard / Detailed video frame sampling
+- [x] Prompt history, up to 10 records
 
-```bash
-npm install
-```
+Planned:
 
-### Build the extension
+- [ ] Better image source fallback
+- [ ] Prompt style presets
+- [ ] Batch image analysis
+- [ ] Direct video URL import
+- [ ] Optional online video visible segment capture
 
-```bash
-npm run build
-```
+## License
 
-### Load in Chrome
+This project is licensed under the MIT License.
 
-1. Open `chrome://extensions`
-2. Enable Developer mode
-3. Click Load unpacked
-4. Select the `dist` folder
-
-## Test
-
-### Local video
-
-1. Open the side panel
-2. Upload a local video
-3. Choose `Fast`, `Standard`, or `Detailed` in Settings if needed
-4. Click `Analyze`
-
-### Web image
-
-1. Open a page with a normal `<img>`
-2. Right-click the image
-3. Click `Analyze Image to Prompt`
-
-### Local image
-
-1. Open the side panel
-2. Upload a local image
-3. Click `Analyze`
+The PromptLab name, logo, and branding assets are not included in the MIT License and may not be used without permission.
