@@ -100,31 +100,52 @@ function normalizeVideoResponse(response: GeminiVideoPromptResponse): GeminiVide
   const normalizedTimeline = Array.isArray(timeline)
     ? timeline
         .filter(
-          (item): item is { time: string; description: string } =>
+          (
+            item
+          ): item is {
+            time: string;
+            subject: string;
+            action: string;
+            setting: string;
+            camera: string;
+            mood: string;
+            sound: string;
+          } =>
             !!item &&
             typeof item === "object" &&
             isNonEmptyString((item as { time?: unknown }).time) &&
-            isNonEmptyString((item as { description?: unknown }).description)
+            isNonEmptyString((item as { subject?: unknown }).subject) &&
+            isNonEmptyString((item as { action?: unknown }).action) &&
+            isNonEmptyString((item as { setting?: unknown }).setting) &&
+            isNonEmptyString((item as { camera?: unknown }).camera) &&
+            isNonEmptyString((item as { mood?: unknown }).mood) &&
+            isNonEmptyString((item as { sound?: unknown }).sound)
         )
         .map((item) => ({
           time: item.time.trim(),
-          description: item.description.trim()
+          subject: item.subject.trim(),
+          action: item.action.trim(),
+          setting: item.setting.trim(),
+          camera: item.camera.trim(),
+          mood: item.mood.trim(),
+          sound: item.sound.trim()
         }))
+    : [];
+
+  const consistencyConstraints = Array.isArray(response.generatedPrompt?.consistencyConstraints)
+    ? response.generatedPrompt.consistencyConstraints
+        .filter(isNonEmptyString)
+        .map((item) => item.trim())
+        .filter(Boolean)
     : [];
 
   const normalized: GeminiVideoPromptResponse = {
     videoSummary: response.videoSummary?.trim?.() ?? "",
     targetModel: response.targetModel?.trim?.() ?? "",
     generatedPrompt: {
-      openingLine: response.generatedPrompt?.openingLine?.trim?.() ?? "",
-      mainSubject: response.generatedPrompt?.mainSubject?.trim?.() ?? "",
-      scene: response.generatedPrompt?.scene?.trim?.() ?? "",
+      globalStyle: response.generatedPrompt?.globalStyle?.trim?.() ?? "",
       timeline: normalizedTimeline,
-      camera: response.generatedPrompt?.camera?.trim?.() ?? "",
-      motion: response.generatedPrompt?.motion?.trim?.() ?? "",
-      lighting: response.generatedPrompt?.lighting?.trim?.() ?? "",
-      style: response.generatedPrompt?.style?.trim?.() ?? "",
-      qualityConstraints: response.generatedPrompt?.qualityConstraints?.trim?.() ?? ""
+      consistencyConstraints
     }
   };
 
@@ -132,15 +153,9 @@ function normalizeVideoResponse(response: GeminiVideoPromptResponse): GeminiVide
   const isValid =
     isNonEmptyString(normalized.videoSummary) &&
     isNonEmptyString(normalized.targetModel) &&
-    isNonEmptyString(prompt.openingLine) &&
-    isNonEmptyString(prompt.mainSubject) &&
-    isNonEmptyString(prompt.scene) &&
+    isNonEmptyString(prompt.globalStyle) &&
     prompt.timeline.length > 0 &&
-    isNonEmptyString(prompt.camera) &&
-    isNonEmptyString(prompt.motion) &&
-    isNonEmptyString(prompt.lighting) &&
-    isNonEmptyString(prompt.style) &&
-    isNonEmptyString(prompt.qualityConstraints);
+    consistencyConstraints.length > 0;
 
   if (!isValid) {
     throw new Error("Gemini returned an invalid response format. Please try again.");
@@ -200,35 +215,33 @@ function normalizeImageResponse(response: GeminiImagePromptResponse): GeminiImag
 
 export function formatVideoPrompt(promptResult: GeminiVideoPromptResponse): string {
   const timelineText = promptResult.generatedPrompt.timeline
-    .map((item) => `[${item.time}]: ${item.description}`)
+    .map((item) =>
+      [
+        `${item.time}:`,
+        `Subject: ${item.subject}`,
+        `Action: ${item.action}`,
+        `Setting: ${item.setting}`,
+        `Camera: ${item.camera}`,
+        `Mood: ${item.mood}`,
+        `Sound: ${item.sound}`
+      ].join("\n")
+    )
+    .join("\n\n");
+
+  const constraintsText = promptResult.generatedPrompt.consistencyConstraints
+    .map((item) => `- ${item}`)
     .join("\n");
 
   return [
-    promptResult.generatedPrompt.openingLine,
+    "Global Style:",
+    promptResult.generatedPrompt.globalStyle,
     "",
-    "Main subject:",
-    promptResult.generatedPrompt.mainSubject,
+    "Shot-by-Shot Timeline:",
     "",
-    "Scene:",
-    promptResult.generatedPrompt.scene,
-    "",
-    "Timeline:",
     timelineText,
     "",
-    "Camera:",
-    promptResult.generatedPrompt.camera,
-    "",
-    "Motion:",
-    promptResult.generatedPrompt.motion,
-    "",
-    "Lighting:",
-    promptResult.generatedPrompt.lighting,
-    "",
-    "Style:",
-    promptResult.generatedPrompt.style,
-    "",
-    "Quality Constraints:",
-    promptResult.generatedPrompt.qualityConstraints
+    "Consistency & Quality Constraints:",
+    constraintsText
   ].join("\n");
 }
 

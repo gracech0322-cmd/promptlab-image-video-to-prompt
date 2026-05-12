@@ -8,9 +8,9 @@ function targetModelLabel(targetModel: TargetModelId): string {
   return TARGET_MODELS.find((model) => model.id === targetModel)?.label ?? targetModel;
 }
 
-function inferAspectRatio(videoInfo?: DetectedVideoInfo): string {
+function inferAspectRatio(videoInfo?: DetectedVideoInfo): string | null {
   if (!videoInfo?.videoWidth || !videoInfo.videoHeight) {
-    return "the source video's aspect ratio";
+    return null;
   }
 
   const ratio = videoInfo.videoWidth / videoInfo.videoHeight;
@@ -39,13 +39,7 @@ export const GEMINI_VIDEO_RESPONSE_SCHEMA = {
     generatedPrompt: {
       type: "object",
       properties: {
-        openingLine: {
-          type: "string"
-        },
-        mainSubject: {
-          type: "string"
-        },
-        scene: {
+        globalStyle: {
           type: "string"
         },
         timeline: {
@@ -56,40 +50,36 @@ export const GEMINI_VIDEO_RESPONSE_SCHEMA = {
               time: {
                 type: "string"
               },
-              description: {
+              subject: {
+                type: "string"
+              },
+              action: {
+                type: "string"
+              },
+              setting: {
+                type: "string"
+              },
+              camera: {
+                type: "string"
+              },
+              mood: {
+                type: "string"
+              },
+              sound: {
                 type: "string"
               }
             },
-            required: ["time", "description"]
+            required: ["time", "subject", "action", "setting", "camera", "mood", "sound"]
           }
         },
-        camera: {
-          type: "string"
-        },
-        motion: {
-          type: "string"
-        },
-        lighting: {
-          type: "string"
-        },
-        style: {
-          type: "string"
-        },
-        qualityConstraints: {
-          type: "string"
+        consistencyConstraints: {
+          type: "array",
+          items: {
+            type: "string"
+          }
         }
       },
-      required: [
-        "openingLine",
-        "mainSubject",
-        "scene",
-        "timeline",
-        "camera",
-        "motion",
-        "lighting",
-        "style",
-        "qualityConstraints"
-      ]
+      required: ["globalStyle", "timeline", "consistencyConstraints"]
     }
   },
   required: ["videoSummary", "targetModel", "generatedPrompt"]
@@ -102,36 +92,70 @@ export function buildGeminiVideoInstruction(
   const modelLabel = targetModelLabel(targetModel);
   const durationHint =
     typeof videoInfo?.duration === "number" && Number.isFinite(videoInfo.duration)
-      ? `${Math.max(1, Math.round(videoInfo.duration))}`
-      : "8 to 10";
+      ? `${Math.max(1, Math.round(videoInfo.duration))} seconds`
+      : "the source video length";
+  const aspectRatioHint = inferAspectRatio(videoInfo);
 
   return `You are an expert AI video prompt engineer.
 
 Analyze the provided video keyframes and infer the full video structure.
 
-Generate a structured English AI video prompt optimized for the selected target model: ${modelLabel}.
+Generate one structured English AI video prompt optimized for the selected target model: ${modelLabel}.
 
 Video metadata:
 - Page title: ${videoInfo?.pageTitle ?? "Unknown"}
 - Page URL: ${videoInfo?.pageUrl ?? "Unknown"}
-- Source duration hint: ${durationHint} seconds
-- Source aspect ratio hint: ${inferAspectRatio(videoInfo)}
+- Source duration hint: ${durationHint}
+- Source aspect ratio hint: ${aspectRatioHint ?? "unknown"}
 
-Focus on:
-- main subject
-- subject appearance
-- scene and environment
-- motion and action
-- camera movement
-- transition
-- lighting
-- color grading
-- visual style
-- timeline structure
-- quality constraints
+Output goals:
+- The final result must still be one single usable prompt.
+- Inside that prompt, organize the content into three sections:
+  1. Global Style
+  2. Shot-by-Shot Timeline
+  3. Consistency & Quality Constraints
+- Keep the writing natural and production-ready.
+- Do not invent major story events that are not supported by the video.
+
+Global Style requirements:
+- Describe the global visual style shared across the full video.
+- Include visual style, image quality, lighting tone, color mood, and overall atmosphere.
+- Include aspect ratio only if it is reasonably clear from the video.
+- If the lighting changes over time, say that it changes naturally across the timeline.
+- Write this as one natural English paragraph.
+
+Shot-by-Shot Timeline requirements:
+- Split the video into 2 to 4 time segments for short videos, or more only when the content clearly needs it.
+- Use approximate time ranges when exact timing is unclear.
+- Each segment must contain:
+  - Subject
+  - Action
+  - Setting
+  - Camera
+  - Mood
+  - Sound
+- Subject should stay clear. If it is the same subject, you may say "same subject" only when clarity is still preserved.
+- Action must be specific and visible.
+- Setting must describe the visible environment.
+- Camera must use one main camera move only.
+- Mood must be visually concrete through expression, body language, movement rhythm, and visible emotion.
+- Sound must describe ambient sound, music, sound effects, or environmental audio. Do not invent dialogue unless clearly visible.
+- If little sound is implied, use: "subtle ambient sound only, no dialogue."
+
+Consistency & Quality Constraints requirements:
+- Return clear English bullet-point constraints.
+- Cover subject consistency, natural motion, anti-deformation, stable scene, stable lighting, clean image quality, camera movement control, and sound consistency.
+- Include constraints equivalent to these ideas:
+  - Keep the same subject consistent across all shots, including face, clothing, body shape, hairstyle, accessories, and proportions.
+  - Motion should be smooth, physically natural, and free from jitter, twitching, sticky limbs, or sudden speed jumps.
+  - Avoid face distortion, extra fingers, folded limbs, object intersections, warped objects, or broken anatomy.
+  - Keep backgrounds stable without flickering, sudden changes, perspective collapse, or texture crawling.
+  - Maintain stable exposure and shadow direction consistent with the global lighting tone.
+  - Keep the image clean, sharp, and free from noise, mosaic artifacts, edge aliasing, or compression artifacts.
+  - Use only one main camera movement per time segment.
+  - Keep sound consistent with the scene.
 
 Return valid JSON only.
-
 Do not include Markdown.
 Do not include code fences.
 Do not include explanations outside the JSON.
@@ -142,28 +166,22 @@ The JSON must follow this exact structure:
   "videoSummary": "A short English summary of the video, including subject, action, scene, mood, and visual style.",
   "targetModel": "${modelLabel}",
   "generatedPrompt": {
-    "openingLine": "Create a ${durationHint}-second cinematic video in ${inferAspectRatio(videoInfo)}.",
-    "mainSubject": "Describe the main subject, appearance, outfit, posture, emotion, and identity consistency details.",
-    "scene": "Describe the location, time of day, background, environment, atmosphere, props, and spatial layout.",
+    "globalStyle": "One natural English paragraph describing the shared global style of the whole video.",
     "timeline": [
       {
         "time": "0-3s",
-        "description": "Describe the opening shot, subject action, camera movement, and visual focus."
-      },
-      {
-        "time": "3-6s",
-        "description": "Describe the main motion, interaction, transition, and camera movement."
-      },
-      {
-        "time": "6-10s",
-        "description": "Describe the final action, ending composition, emotional beat, and camera movement."
+        "subject": "Describe the subject in this time segment.",
+        "action": "Describe the visible action in this time segment.",
+        "setting": "Describe the visible setting in this time segment.",
+        "camera": "Describe one main camera movement or camera setup only.",
+        "mood": "Describe visible emotion through facial expression, posture, movement rhythm, and body language.",
+        "sound": "Describe ambient sound, music, and sound effects, or say subtle ambient sound only, no dialogue."
       }
     ],
-    "camera": "Describe shot type, framing, angle, camera movement, speed, lens feeling, and transition style.",
-    "motion": "Describe subject movement, object movement, background movement, rhythm, and continuity.",
-    "lighting": "Describe light source, color temperature, contrast, shadows, highlights, and mood.",
-    "style": "Describe visual style, genre, color grading, realism level, texture, and production quality.",
-    "qualityConstraints": "stable subject, consistent character, smooth motion, natural body movement, natural facial details, no flicker, no deformation, no distorted hands, no extra limbs, no sudden identity change."
+    "consistencyConstraints": [
+      "One bullet-point style quality or consistency constraint.",
+      "Another bullet-point style quality or consistency constraint."
+    ]
   }
 }
 

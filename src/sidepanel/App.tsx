@@ -1,5 +1,5 @@
 import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
-import { analyzeImageWithGemini, analyzeVideoFramesWithGemini } from "../lib/geminiClient";
+import { analyzeImageWithGemini, analyzeVideoFramesWithGemini, enhancePromptWithGemini } from "../lib/geminiClient";
 import { extractFrames } from "../lib/frameExtractor";
 import { readFileAsDataUrl } from "../lib/imageUtils";
 import {
@@ -36,7 +36,8 @@ type StartAnalysisResponse = {
   state: AnalysisState;
 };
 
-type PanelView = "main" | "history" | "settings";
+type PanelView = "main" | "enhancer" | "history" | "settings";
+type PromptEnhancerMode = "video" | "image";
 
 type MediaSource =
   | { kind: "none" }
@@ -90,6 +91,47 @@ function CopyIcon() {
     <svg aria-hidden="true" className="tiny-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <rect x="9" y="9" width="11" height="11" rx="2" />
       <path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
+
+function WandIcon() {
+  return (
+    <svg aria-hidden="true" className="tiny-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1l1-4Z" />
+    </svg>
+  );
+}
+
+function EnhancerVideoIcon() {
+  return (
+    <svg aria-hidden="true" className="tiny-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="6" width="13" height="12" rx="2" />
+      <path d="M16 10l5-3v10l-5-3" />
+      <path d="M8 10l3 2l-3 2z" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function EnhancerImageIcon() {
+  return (
+    <svg aria-hidden="true" className="tiny-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <circle cx="9" cy="10" r="1.5" />
+      <path d="M21 15l-4.2-4.2a1.4 1.4 0 0 0-2 0L9 16.5" />
+      <path d="M13 14l1.8-1.8a1.4 1.4 0 0 1 2 0L21 16.5" />
+    </svg>
+  );
+}
+
+function EnhanceActionIcon() {
+  return (
+    <svg aria-hidden="true" className="tiny-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1l1-4Z" />
+      <path d="M4.5 4.5l.5 1.5l1.5.5L5 7l-.5 1.5L4 7L2.5 6.5L4 6z" />
+      <path d="M9 3l.6 1.8l1.8.6l-1.8.6L9 7.8l-.6-1.8l-1.8-.6l1.8-.6z" />
     </svg>
   );
 }
@@ -317,6 +359,12 @@ function getHistorySourceLabel(
   if (sourceType === "local" && mediaType === "image") {
     return "Local image";
   }
+  if (sourceType === "enhancer" && mediaType === "video") {
+    return "Video Prompt Enhancer";
+  }
+  if (sourceType === "enhancer" && mediaType === "image") {
+    return "Image Prompt Enhancer";
+  }
   return "Web image";
 }
 
@@ -383,6 +431,12 @@ export function App() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [showApiKey, setShowApiKey] = useState(false);
   const [showSamplingInfo, setShowSamplingInfo] = useState(false);
+  const [enhancerMode, setEnhancerMode] = useState<PromptEnhancerMode>("video");
+  const [enhancerInput, setEnhancerInput] = useState("");
+  const [enhancerResultMode, setEnhancerResultMode] = useState<"empty" | "loading" | "text" | "error">("empty");
+  const [enhancerResultText, setEnhancerResultText] = useState("Enhanced prompt will appear here.");
+  const [enhancerCopyLabel, setEnhancerCopyLabel] = useState("Copy");
+  const [isEnhancingPrompt, setIsEnhancingPrompt] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const localObjectUrlRef = useRef<string | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -400,6 +454,10 @@ export function App() {
   const showCopy = resultMode === "text" && resultText.trim().length > 0;
   const showGenerateVideo = showCopy && analysisState.mediaType === "video";
   const showGenerateImage = showCopy && analysisState.mediaType === "image";
+  const canEnhancePrompt = enhancerInput.trim().length > 0 && !isEnhancingPrompt;
+  const showEnhancerCopy = enhancerResultMode === "text" && enhancerResultText.trim().length > 0;
+  const showEnhancerGenerateVideo = showEnhancerCopy && enhancerMode === "video";
+  const showEnhancerGenerateImage = showEnhancerCopy && enhancerMode === "image";
 
   useEffect(() => {
     void (async () => {
@@ -770,6 +828,74 @@ export function App() {
     setMenuOpen(false);
   }
 
+  function handleOpenEnhancerView() {
+    setPanelView("enhancer");
+    setMenuOpen(false);
+  }
+
+  function resetEnhancerResult() {
+    setEnhancerResultMode("empty");
+    setEnhancerResultText("Enhanced prompt will appear here.");
+    setEnhancerCopyLabel("Copy");
+  }
+
+  async function handleEnhancePrompt() {
+    if (!enhancerInput.trim() || isEnhancingPrompt) {
+      return;
+    }
+
+    if (!hasApiKey) {
+      setPanelView("settings");
+      setMenuOpen(false);
+      return;
+    }
+
+    setIsEnhancingPrompt(true);
+    setEnhancerResultMode("loading");
+    setEnhancerResultText("Enhancing prompt...");
+    setEnhancerCopyLabel("Copy");
+
+    try {
+      const result = await enhancePromptWithGemini({
+        apiKey: settings.geminiApiKey,
+        mode: enhancerMode,
+        idea: enhancerInput
+      });
+      setEnhancerResultMode("text");
+      setEnhancerResultText(result);
+
+      await persistHistoryRecord({
+        sourceType: "enhancer",
+        mediaType: enhancerMode,
+        sourceUrl: `prompt-enhancer://${enhancerMode}`,
+        pageTitle: enhancerMode === "video" ? "Video Prompt Enhancer" : "Image Prompt Enhancer",
+        promptText: result,
+        videoSummary: enhancerInput.trim(),
+        dedupeKey: `enhancer:${enhancerMode}:${result}`
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not enhance this prompt. Please try again.";
+      setEnhancerResultMode("error");
+      setEnhancerResultText(message);
+    } finally {
+      setIsEnhancingPrompt(false);
+    }
+  }
+
+  async function handleCopyEnhancerResult() {
+    if (!showEnhancerCopy) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(enhancerResultText);
+      setEnhancerCopyLabel("Copied");
+      window.setTimeout(() => setEnhancerCopyLabel("Copy"), 1600);
+    } catch {
+      setEnhancerCopyLabel("Copy");
+    }
+  }
+
   async function handleLocalUpload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) {
@@ -947,6 +1073,10 @@ export function App() {
 
                 {menuOpen ? (
                   <div className="header-dropdown-menu">
+                    <button className="dropdown-item" onClick={handleOpenEnhancerView}>
+                      <WandIcon />
+                      <span>Enhancer</span>
+                    </button>
                     <button
                       className="dropdown-item"
                       onClick={() => {
@@ -965,7 +1095,7 @@ export function App() {
                 ) : null}
               </div>
             </div>
-            <p>Turn videos and images into prompts.</p>
+            <p>Turn images, videos, and short ideas into prompts.</p>
             <span className="header-glow" aria-hidden="true" />
           </section>
 
@@ -1066,6 +1196,132 @@ export function App() {
         </>
       ) : null}
 
+      {panelView === "enhancer" ? (
+        <section className="subview-screen enhancer-screen">
+          <span className="subview-screen-glow" aria-hidden="true" />
+          <div className="subview-topbar">
+            <div className="subview-title-row">
+              <button className="back-button back-button-box" onClick={() => setPanelView("main")}>
+                <BackIcon />
+              </button>
+              <h2 className="subview-title">Prompt Enhancer</h2>
+            </div>
+            <p className="subview-subtitle">Turn a short idea into a ready-to-use AI prompt.</p>
+          </div>
+
+          <section className="enhancer-stack">
+            <article className="promptlab-card enhancer-card">
+              <div className="enhancer-tabs" role="tablist" aria-label="Prompt enhancer mode">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={enhancerMode === "video"}
+                  className={`enhancer-tab ${enhancerMode === "video" ? "is-selected" : ""}`}
+                  onClick={() => {
+                    setEnhancerMode("video");
+                    resetEnhancerResult();
+                  }}
+                >
+                  <EnhancerVideoIcon />
+                  <span>Video</span>
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={enhancerMode === "image"}
+                  className={`enhancer-tab ${enhancerMode === "image" ? "is-selected" : ""}`}
+                  onClick={() => {
+                    setEnhancerMode("image");
+                    resetEnhancerResult();
+                  }}
+                >
+                  <EnhancerImageIcon />
+                  <span>Image</span>
+                </button>
+              </div>
+
+              <label className="enhancer-field">
+                <textarea
+                  value={enhancerInput}
+                  onChange={(event) => setEnhancerInput(event.target.value)}
+                  placeholder={
+                    enhancerMode === "video"
+                      ? 'Describe your video idea briefly, e.g. "a girl walking in the rain"'
+                      : 'Describe your image idea briefly, e.g. "a golden retriever puppy running in grass"'
+                  }
+                  rows={5}
+                />
+              </label>
+
+              <button
+                className={`primary-button full-width-button enhancer-submit-button ${isEnhancingPrompt ? "primary-button-analyzing" : ""}`}
+                onClick={() => void handleEnhancePrompt()}
+                disabled={!canEnhancePrompt}
+              >
+                {isEnhancingPrompt ? (
+                  <>
+                    <SpinnerIcon />
+                    Enhancing
+                  </>
+                ) : (
+                  <>
+                    <EnhanceActionIcon />
+                    <span>Enhance</span>
+                  </>
+                )}
+              </button>
+            </article>
+
+            <article className="promptlab-card enhancer-card">
+              <div className="result-header">
+                <div className="card-title">Final Result</div>
+                {showEnhancerCopy ? (
+                  <button className="copy-button" onClick={() => void handleCopyEnhancerResult()}>
+                    {enhancerCopyLabel}
+                  </button>
+                ) : null}
+              </div>
+
+              <div className={`result-box result-box-${enhancerResultMode}`}>
+                {enhancerResultMode === "loading" ? (
+                  <div className="loading-state">
+                    <SpinnerIcon />
+                    <strong>Enhancing prompt...</strong>
+                    <p>This may take a few moments.</p>
+                  </div>
+                ) : null}
+
+                {enhancerResultMode === "empty" ? (
+                  <div className="result-placeholder">
+                    <SparklePlaceholder />
+                    <p>Enhanced prompt will appear here.</p>
+                  </div>
+                ) : null}
+
+                {enhancerResultMode === "error" ? (
+                  <div className="result-error">
+                    <p>{enhancerResultText}</p>
+                  </div>
+                ) : null}
+
+                {enhancerResultMode === "text" ? <div className="result-text-block">{enhancerResultText}</div> : null}
+              </div>
+            {showEnhancerGenerateVideo ? (
+              <button className="generate-video-button" onClick={handleGenerateVideo}>
+                Generate Video
+              </button>
+            ) : null}
+
+            {showEnhancerGenerateImage ? (
+              <button className="generate-video-button" onClick={handleGenerateVideo}>
+                Generate Image
+              </button>
+            ) : null}
+          </article>
+          </section>
+        </section>
+      ) : null}
+
       {panelView === "history" ? (
         <section className="subview-screen history-screen">
           <span className="subview-screen-glow" aria-hidden="true" />
@@ -1076,7 +1332,7 @@ export function App() {
               </button>
               <h2 className="subview-title">History</h2>
             </div>
-            <p className="subview-subtitle">Latest 10 prompts</p>
+            <p className="subview-subtitle">Latest 20 prompts</p>
           </div>
 
           <section className="history-panel">
@@ -1096,7 +1352,7 @@ export function App() {
                           <span>{formatHistoryTime(item.createdAt)}</span>
                         </span>
                         <span className={`source-pill ${item.sourceType === "local" ? "source-pill-local" : "source-pill-web"}`}>
-                          {item.sourceType === "local" ? <CloudUploadIcon /> : <GlobeIcon />}
+                          {item.sourceType === "local" ? <CloudUploadIcon /> : item.sourceType === "enhancer" ? <WandIcon /> : <GlobeIcon />}
                           {getHistorySourceLabel(item.sourceType, item.mediaType)}
                         </span>
                       </div>

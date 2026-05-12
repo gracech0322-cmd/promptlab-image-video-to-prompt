@@ -1,13 +1,14 @@
 # PromptLab: Image & Video to Prompt
 
-Turn local videos and web/local images into ready-to-use AI prompts.
+Turn local videos, web/local images, and short ideas into ready-to-use AI prompts.
 
-PromptLab is a Chrome extension for AI creators, prompt learners, visual reference study, and short video prompt reverse engineering. It helps you turn local video files, web images, and local image files into clean prompts you can copy and use.
+PromptLab is a Chrome extension for AI creators, prompt learners, visual reference study, and short video prompt reverse engineering. It helps you turn local video files, web images, local image files, and short creative ideas into clean prompts you can copy and use.
 
 ## 🎬 Table of Contents
 
 - [What Is PromptLab?](#what-is-promptlab)
 - [Features](#features)
+- [Prompt Enhancer](#prompt-enhancer)
 - [Installation](#installation)
 - [How to Get Free Gemini API Key?](#how-to-get-free-gemini-api-key)
 - [API Key Privacy](#api-key-privacy)
@@ -22,7 +23,7 @@ PromptLab is a Chrome extension for AI creators, prompt learners, visual referen
 
 ## What Is PromptLab?
 
-PromptLab can analyze local video files, web images, and local image files.
+PromptLab can analyze local video files, web images, and local image files. It also includes a Prompt Enhancer for turning short ideas into ready-to-use prompts.
 
 ### Local Video to Prompt
 
@@ -70,7 +71,7 @@ For video analysis, please upload a local video file.
 ### Prompt History
 
 - Automatically saves recent generation records
-- Keeps up to 10 recent records
+- Keeps up to 20 recent records
 
 ### Simple Output
 
@@ -79,6 +80,36 @@ For video analysis, please upload a local video file.
 - No unnecessary labels like "Image Prompt:" or "Analysis:"
 - Copy and use directly
 
+### Prompt Enhancer
+
+- Turn short ideas into ready-to-use prompts
+- Includes a Video Prompt mode and an Image Prompt mode
+- Uses one clean Final Result output
+- Works as an optional helper tool alongside the main image and video workflows
+
+## Prompt Enhancer
+
+Prompt Enhancer is a helper tool inside PromptLab. It takes a short idea and rewrites it into a fuller prompt that is easier to copy and use.
+
+### Video Prompt
+
+Use Video Prompt when you have a short video idea and want a stronger AI video prompt.
+
+- Expands a short idea into a Seedance 2.0-style video prompt
+- Keeps the output as one clean Final Result
+- Uses a structured video prompt format with global style, shot-by-shot timeline, and quality constraints
+- Can also be used as a reference prompt for other AI video models
+
+### Image Prompt
+
+Use Image Prompt when you want a short visual idea turned into a fuller image generation prompt.
+
+- Expands a short idea into a general image generation prompt
+- Does not use model-specific tags such as `--ar`, `--v`, or `--style`
+- Focuses on subject, scene, composition, lighting, color, mood, and detail
+- Outputs one clean Final Result that is ready to copy
+
+Prompt Enhancer is optional. It does not replace the main Local Video to Prompt, Web Image to Prompt, or Local Image to Prompt workflows.
 
 ## Installation
 
@@ -277,7 +308,7 @@ You can set a daily API usage limit in Google AI Studio.
 - [x] Web image to prompt
 - [x] Local image to prompt
 - [x] Fast / Standard / Detailed video frame sampling
-- [x] Prompt history, up to 10 records
+- [x] Prompt history, up to 20 records
 
 Planned:
 

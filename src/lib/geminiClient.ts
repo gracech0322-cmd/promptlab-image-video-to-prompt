@@ -1,4 +1,9 @@
 import {
+  buildPromptEnhancerImageInstruction,
+  buildPromptEnhancerVideoInstruction,
+  type PromptEnhancerMode
+} from "./prompts/enhancer";
+import {
   GEMINI_IMAGE_RESPONSE_SCHEMA,
   GEMINI_VIDEO_RESPONSE_SCHEMA,
   buildGeminiImageInstruction,
@@ -223,4 +228,99 @@ export async function analyzeImageWithGemini({
 
   const text = readGeminiText(payload);
   return parseGeminiImageResponse(text);
+}
+
+function cleanEnhancedPrompt(text: string): string {
+  return text
+    .replace(/^```(?:\w+)?\s*/i, "")
+    .replace(/```$/i, "")
+    .replace(/^(?:enhanced\s+prompt|video\s+prompt|image\s+prompt|final\s+prompt|prompt)\s*:\s*/i, "")
+    .trim();
+}
+
+export async function enhancePromptWithGemini({
+  apiKey,
+  mode,
+  idea
+}: {
+  apiKey: string;
+  mode: PromptEnhancerMode;
+  idea: string;
+}): Promise<string> {
+  const trimmedIdea = idea.trim();
+  if (!trimmedIdea) {
+    throw new Error("Enter a short idea first.");
+  }
+
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_ANALYSIS_MODEL}:generateContent`;
+
+  if (mode === "video") {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: buildPromptEnhancerVideoInstruction(trimmedIdea) }]
+          }
+        ],
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: GEMINI_VIDEO_RESPONSE_SCHEMA,
+          temperature: 0.45,
+          topP: 0.9
+        }
+      })
+    });
+
+    const payload = (await response.json()) as unknown;
+    if (!response.ok) {
+      throw new Error(
+        readGeminiError(payload) ??
+          "Gemini API request failed. Please check your API key, quota, or network connection."
+      );
+    }
+
+    const text = readGeminiText(payload);
+    return parseGeminiVideoResponse(text).generatedPrompt;
+  }
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": apiKey
+    },
+    body: JSON.stringify({
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: buildPromptEnhancerImageInstruction(trimmedIdea) }]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.55,
+        topP: 0.9
+      }
+    })
+  });
+
+  const payload = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error(
+      readGeminiError(payload) ??
+        "Gemini API request failed. Please check your API key, quota, or network connection."
+    );
+  }
+
+  const prompt = cleanEnhancedPrompt(readGeminiText(payload));
+  if (!prompt) {
+    throw new Error("Gemini did not return a valid prompt. Please try again.");
+  }
+
+  return prompt;
 }

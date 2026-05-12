@@ -16,7 +16,7 @@ export type FrameExtractionOptions = {
 };
 
 export type AnalysisMediaType = "video" | "image";
-export type AnalysisSourceType = "web" | "local";
+export type AnalysisSourceType = "web" | "local" | "enhancer";
 
 export type DetectedVideoInfo = {
   found: boolean;
@@ -93,19 +93,18 @@ export type PromptHistoryItem = {
 
 export type GeneratedPromptTimelineItem = {
   time: string;
-  description: string;
+  subject: string;
+  action: string;
+  setting: string;
+  camera: string;
+  mood: string;
+  sound: string;
 };
 
 export type GeneratedPromptBody = {
-  openingLine: string;
-  mainSubject: string;
-  scene: string;
+  globalStyle: string;
   timeline: GeneratedPromptTimelineItem[];
-  camera: string;
-  motion: string;
-  lighting: string;
-  style: string;
-  qualityConstraints: string;
+  consistencyConstraints: string[];
 };
 
 export type GeminiVideoPromptResponse = {

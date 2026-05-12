@@ -147,8 +147,15 @@ export async function getPromptHistory(): Promise<PromptHistoryItem[]> {
     return {
       id: normalized.id ?? `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       createdAt: normalized.createdAt ?? Date.now(),
-      sourceType: normalized.sourceType === "web" ? "web" : "local",
-      mediaType: normalized.mediaType ?? (normalized.sourceType === "web" ? "image" : "video"),
+      sourceType:
+        normalized.sourceType === "web"
+          ? "web"
+          : normalized.sourceType === "enhancer"
+            ? "enhancer"
+            : "local",
+      mediaType:
+        normalized.mediaType ??
+        (normalized.sourceType === "web" ? "image" : normalized.sourceType === "enhancer" ? "video" : "video"),
       sourceUrl: normalized.sourceUrl,
       pageTitle: normalized.pageTitle,
       thumbnailDataUrl: normalized.thumbnailDataUrl,
@@ -161,7 +168,7 @@ export async function getPromptHistory(): Promise<PromptHistoryItem[]> {
 async function savePromptHistory(
   history: PromptHistoryItem[]
 ): Promise<PromptHistoryItem[]> {
-  const next = history.slice(0, 10);
+  const next = history.slice(0, 20);
   await chrome.storage.local.set({
     [HISTORY_KEY]: next
   });
