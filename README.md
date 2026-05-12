@@ -228,6 +228,8 @@ The final result is written in a **Seedance 2.0-style prompt format**, focusing 
 
 Although the output is designed around Seedance 2.0-style prompting, it can also be used as a strong reference prompt for other AI video generation models. You may adjust the wording based on the model you use.
 
+**Read More**:[Seedance 2.0 Prompt Library](https://github.com/gracech0322-cmd/seedance-2-prompt-library)
+
 It focuses on:
 
 - Subject
