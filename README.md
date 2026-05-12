@@ -7,8 +7,7 @@ PromptLab is a Chrome extension for AI creators, prompt learners, visual referen
 ## 🎬 Table of Contents
 
 - [What Is PromptLab?](#what-is-promptlab)
-- [Features](#features)
-- [Prompt Enhancer](#prompt-enhancer)
+- [What Can PromptLab Do?](#what-can-promptlab-do)
 - [Installation](#installation)
 - [How to Get Free Gemini API Key?](#how-to-get-free-gemini-api-key)
 - [API Key Privacy](#api-key-privacy)
@@ -23,7 +22,13 @@ PromptLab is a Chrome extension for AI creators, prompt learners, visual referen
 
 ## What Is PromptLab?
 
-PromptLab can analyze local video files, web images, and local image files. It also includes a Prompt Enhancer for turning short ideas into ready-to-use prompts.
+PromptLab is a Chrome extension that turns local videos, web images, local image files, and short ideas into ready-to-use AI prompts. It is made for AI creators, prompt learners, visual reference study, and short video prompt reverse engineering.
+
+PromptLab does not currently support full online video analysis from platforms like Instagram, TikTok, X, Facebook, or YouTube.
+
+For video analysis, please upload a local video file.
+
+## What Can PromptLab Do?
 
 ### Local Video to Prompt
 
@@ -31,11 +36,21 @@ PromptLab can analyze local video files, web images, and local image files. It a
 
 Upload a local video file. PromptLab samples key frames and turns them into one clean Final Result prompt.
 
+- Best for short local videos under 60 seconds
+- Extracts key frames automatically
+- Designed for short creative videos, AI videos, ads, reels, and cinematic clips
+- Default frame sampling mode: Standard
+- Supports Fast / Standard / Detailed frame sampling modes
+
 ### Web Image to Prompt
 
 ![Web image to prompt](assets/web-image-to-prompt.jpg)
 
 Right-click a web image. PromptLab reads the image and creates a ready-to-use image prompt.
+
+- Uses a dedicated image prompt template
+- Outputs one clean Final Result prompt
+- Optimized for image generation and visual recreation
 
 ### Local Image to Prompt
 
@@ -43,30 +58,21 @@ Right-click a web image. PromptLab reads the image and creates a ready-to-use im
 
 Upload a local image file. PromptLab uses an image-focused template to create one final prompt for image generation.
 
-PromptLab does not currently support full online video analysis from platforms like Instagram, TikTok, X, Facebook, or YouTube.
-
-For video analysis, please upload a local video file.
-
-
-## Features
-
-### Local Video to Prompt
-
-- Best for short local videos under 60 seconds.
-- Upload a local video file
-- Extract key frames automatically
-- Generate one clean Final Result prompt
-- Designed for short creative videos, AI videos, ads, reels, and cinematic clips
-- Default frame sampling mode: Standard
-- Supports Fast / Standard / Detailed frame sampling modes
-
-### Image to Prompt
-
-- Right-click a web image and generate a prompt
-- Upload a local image and generate a prompt
-- Uses a dedicated image prompt template
+- Uses the same image-oriented output style as web image analysis
 - Outputs one clean Final Result prompt
-- Optimized for image generation and visual recreation
+- Built for image generation and visual recreation
+
+### Prompt Enhancer
+
+![Prompt enhancer](assets/prompt-enhancer.jpg)
+
+Turn a short idea into a fuller prompt that is easier to copy and use.
+
+- Includes a Video Prompt mode and an Image Prompt mode
+- Video Prompt expands a short idea into a Seedance 2.0-style video prompt
+- Image Prompt expands a short idea into a general image generation prompt
+- Uses one clean Final Result output
+- Works as an optional helper tool alongside the main image and video workflows
 
 ### Prompt History
 
@@ -79,37 +85,6 @@ For video analysis, please upload a local video file.
 - No long analysis report
 - No unnecessary labels like "Image Prompt:" or "Analysis:"
 - Copy and use directly
-
-### Prompt Enhancer
-
-- Turn short ideas into ready-to-use prompts
-- Includes a Video Prompt mode and an Image Prompt mode
-- Uses one clean Final Result output
-- Works as an optional helper tool alongside the main image and video workflows
-
-## Prompt Enhancer
-
-Prompt Enhancer is a helper tool inside PromptLab. It takes a short idea and rewrites it into a fuller prompt that is easier to copy and use.
-
-### Video Prompt
-
-Use Video Prompt when you have a short video idea and want a stronger AI video prompt.
-
-- Expands a short idea into a Seedance 2.0-style video prompt
-- Keeps the output as one clean Final Result
-- Uses a structured video prompt format with global style, shot-by-shot timeline, and quality constraints
-- Can also be used as a reference prompt for other AI video models
-
-### Image Prompt
-
-Use Image Prompt when you want a short visual idea turned into a fuller image generation prompt.
-
-- Expands a short idea into a general image generation prompt
-- Does not use model-specific tags such as `--ar`, `--v`, or `--style`
-- Focuses on subject, scene, composition, lighting, color, mood, and detail
-- Outputs one clean Final Result that is ready to copy
-
-Prompt Enhancer is optional. It does not replace the main Local Video to Prompt, Web Image to Prompt, or Local Image to Prompt workflows.
 
 ## Installation
 
